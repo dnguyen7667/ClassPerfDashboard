@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Argon Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js" charset="utf-8"></script>
+
+  <!-- Favicon -->
+  {% load static %}
+  
+  <!-- <link href="{% static 'assets/custom.css' %}" rel="stylesheet"> -->
+
+
+  <link href="{% static 'assets/img/brand/favicon.png' %}" rel="icon" type="image/png">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+
+  <!-- Icons -->
+  <link href="{% static 'assets/vendor/@fortawesome/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+
+  <!-- Argon CSS -->
+  <link type="text/css" href="{% static 'assets/css/argon.min.css' %}" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+  <h1>MY FIRST DASH BOARD</h1>
+
+  <div id= "div-first" class="row">
+    <div class="col-sm-6">
+      <canvas id="takenOrNotDonutChart"></canvas>
+    </div>
+    
+    <div class="col-sm-6">
+      <p>Average spent on assignment: {{avg_time_taken}} minutes</p>
+      <button id="like_button_container"></button>
+    </div>
+  </div>
+
+
+
+  <div id= "div-third" class="row">
+    <div class="col-sm-6">
+      <canvas id="hist"></canvas>
+    </div>
+    <div class="col-sm-6">
+      <canvas id="avgTimeTakenBarChart"></canvas>
+      
+
+    </div>
+  </div>
+
+  <div>
+    <canvas id="correctAnswerPercentagesPerQuestionChart"></canvas>
+
+
+  </div>
+
+  
+   
+
+
+
+
+
+
+  <!-- Core -->
+  <script src="{% static 'assets/vendor/jquery/dist/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+
+  <!-- Argon JS -->
+  <script src="{% static 'assets/js/argon.min.js' %}"></script>
+</body>
+
+
+<!-- <script type='text/babel' src = "{% static 'components/Quiz.js' %}"></script> -->
+<script>
+  const ctx = document.getElementById('hist').getContext('2d');
+
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: 
+        {{bins | safe}}
+        
+      ,
+      datasets: [{
+        label: 'Counts',
+        data: 
+        {{counts | safe}},
+        backgroundColor: 'green',
+        hoverBackgroundColor: 'rgb(218, 232, 245)'
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Counts of grades made',
+          color: 'green'
+        },
+        legend: {
+          position: 'right',
+        },
+      },
+      scales: {
+        x:  {
+          display: true,
+          title: {
+            display: true,
+            text: 'Grade bins'
+          }
+        },
+
+        y:  {
+          display: true,
+          title: {
+            display: true,
+            text: 'Counts'
+          }
+        },
+      },
+
+   
+
+    }
+  });
+
+
+
+  var ctx2 = document.getElementById('takenOrNotDonutChart').getContext('2d');
+
+  var takenOrNotDonutChart = new Chart(ctx2, {
+    type: 'doughnut',
+
+
+    data: {
+      labels: ["Taken", "Have not taken"],
+      datasets: [{
+        label: "",
+        backgroundColor: ['green', 'orange'],
+        data: 
+        {{count_taken | safe}}
+      }]
+    },
+
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Counts of students that have or have not taken the quiz',
+          color: 'green'
+        },
+        legend: {
+          position: 'right',
+        },
+      }
+    }
+  });
+
+
+
+  const ctx3 = document.getElementById('avgTimeTakenBarChart').getContext('2d');
+
+  const avgTimeTakenBarChart = new Chart(ctx3, {
+    type: 'bar',
+    data: {
+      labels: 
+        {{bins | safe}},
+      datasets: [{
+        label: 'minutes',
+        data: 
+        {{avg_time_taken_by_group | safe}},
+        backgroundColor: 'green',
+        hoverBackgroundColor: 'rgb(218, 232, 245)'
+      }]
+    },
+    options: {
+      
+      plugins: {
+        title: {
+          display: true,
+          text: 'Bar chart of average time taken based on grades bins',
+          color: 'green'
+        },
+        legend: {
+          position: 'right',
+        },
+      }
+      
+
+    }
+  });
+
+  const ctx4 = document.getElementById('correctAnswerPercentagesPerQuestionChart').getContext('2d');
+
+  const correctAnswerPercentagesPerQuestionChart = new Chart(ctx4, {
+    type: 'bar',
+    data: {
+      labels : {{problems}},
+      datasets: [
+        {
+          label: 'correct',
+          data: [1,2,1,1,1,1,1],
+          backgroundColor: 'green'
+          
+        },
+        {
+          label: 'incorrect',
+          data: [1,2,5,62,2,1,],
+          backgroundColor: 'red'
+
+          
+        }
+       
+      ]
+    
+    },
+    options: {
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: {
+        title: {
+          display: true,
+          text: 'Bar chart of average time taken based on grades bins',
+          color: 'green'
+        },
+        legend: {
+          position: 'right',
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+          title: {
+            display: true,
+            text: '%'
+          }
+        },
+        y: {
+          stacked: true
+        }
+      }
+
+    }
+  });
+  
+
+
+
+</script>
+
+</html>
